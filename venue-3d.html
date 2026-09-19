@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>校园三维导览 · 校园运动场馆信息与数据展示中心</title>
+<meta name="description" content="Three.js 生成的校园运动场馆三维场景：按校区分组，建筑高度表示峰值占用、颜色表示运动类型，支持旋转、缩放、点选与校区跳转">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      onerror="this.onerror=null;this.href='vendor/bootstrap.min.css'">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/pages.css">
+</head>
+<body>
+<a class="skip-link" href="#mainContent">跳到主要内容</a>
+<header>
+  <nav class="navbar navbar-expand-lg navbar-dark site-navbar sticky-top" aria-label="主导航">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">校园运动场馆中心</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#topNavCollapse"
+              aria-controls="topNavCollapse" aria-expanded="false" aria-label="展开或收起导航">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="topNavCollapse">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0" id="siteNav">
+          <li class="nav-item"><a class="nav-link" href="index.html">信息首页</a></li>
+          <li class="nav-item"><a class="nav-link" href="facilities.html">场馆查询与预约</a></li>
+          <li class="nav-item"><a class="nav-link" href="statistics.html">使用数据分析</a></li>
+          <li class="nav-item"><a class="nav-link active" aria-current="page" href="venue-3d.html">校园三维导览</a></li>
+        </ul>
+        <span class="navbar-text load-state" id="loadState">正在读取场馆数据…</span>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<main id="mainContent" class="container py-4">
+  <div id="messages" aria-live="polite"></div>
+
+  <h1 class="h3 mb-1">校园三维导览</h1>
+  <p class="text-secondary small mb-4">把 14 个运动场馆按校区摆进同一张场景图里：一眼看出"哪个校区场馆密、哪栋楼今天最挤"。数据与其余页面同源，本场景不另存一份数字。</p>
+
+  <section class="mb-3" aria-labelledby="controlTitle">
+    <h2 id="controlTitle" class="h6 section-title mb-2">场景操作</h2>
+    <div class="card">
+      <div class="card-body py-3">
+        <div class="row g-3 align-items-start">
+          <div class="col-12 col-lg-6">
+            <span class="small text-secondary d-block mb-1">校区跳转（视角平滑移到该校区）</span>
+            <div class="btn-group btn-group-sm flex-wrap" role="group" aria-label="校区跳转" id="areaJump"></div>
+          </div>
+          <div class="col-12 col-sm-6 col-lg-3">
+            <span class="small text-secondary d-block mb-1">显示选项</span>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="showLabels" checked>
+              <label class="form-check-label small" for="showLabels">显示校区名称标签</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="onlyBookable">
+              <label class="form-check-label small" for="onlyBookable">只显示可预约场馆</label>
+            </div>
+          </div>
+          <div class="col-12 col-sm-6 col-lg-3 d-grid gap-2">
+            <button class="btn btn-sm btn-outline-primary" type="button" id="resetView">重置视角</button>
+            <button class="btn btn-sm btn-outline-secondary" type="button" id="clearPick">取消选中</button>
+          </div>
+        </div>
+        <p class="stage-tip mb-0 mt-2">
+          操作方式：左键按住拖拽＝水平旋转与俯仰；滚轮＝远近缩放；双击＝复位；单击建筑＝选中并在下方显示详情；
+          手机可用单指拖拽、双指捏合缩放。键盘：← → 旋转，↑ ↓ 俯仰，+ − 缩放，Esc 取消选中。
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="mb-3" aria-labelledby="stageTitle">
+    <h2 id="stageTitle" class="h6 visually-hidden">三维场景</h2>
+    <div class="stage-wrap" id="stage" tabindex="0" role="application"
+         aria-label="校园运动场馆三维场景：可用鼠标拖拽旋转、滚轮缩放、点选建筑查看场馆信息">
+      <div class="stage-hud" id="hud">
+        <div>当前选中：<span class="picked-name" id="picked">无</span></div>
+        <div class="text-secondary" id="detail">点击任意建筑查看该场馆的容量与今日占用。</div>
+        <div class="mt-1"><a class="small link-offset-2" href="facilities.html" id="bookingLink">去查询与预约页</a></div>
+      </div>
+      <div id="fallback"></div>
+    </div>
+    <div class="legend-strip mt-2" id="legend"></div>
+    <p class="small text-secondary mt-1 mb-0" id="encoding">建筑含义加载中…</p>
+  </section>
+
+  <section class="mb-4" aria-labelledby="quickListTitle">
+    <h2 id="quickListTitle" class="h6 section-title mb-2">点选不便时：从列表直接定位</h2>
+    <div class="row g-2" id="venueQuickList"></div>
+    <p class="small text-secondary mt-2 mb-0">手机上建筑较小，可用下方按钮逐个定位；点击后三维场景会把该建筑设为视角中心并高亮。</p>
+  </section>
+
+  <section aria-labelledby="whyTitle">
+    <h2 id="whyTitle" class="h6 section-title mb-2">为什么这个作品需要三维展示</h2>
+    <div class="row g-3">
+      <div class="col-12 col-md-6">
+        <article class="card h-100">
+          <div class="card-body small">
+            <h3 class="h6">三维解决的是"空间"问题，表格解决不了</h3>
+            <p class="mb-1">场馆的实用信息有两半：一半是数字（容量、占用、费率），一半是位置（在哪个校区、离宿舍多远、旁边是不是跑道）。表格只能给前一半；本场景把两半画在同一栋"楼"上：位置＝校区分组与地面指引线，拥挤度＝建筑高度，用途＝建筑颜色。</p>
+            <p class="mb-0">对新生和来访人员，"往北区那栋最高的蓝楼走"比"编号 1、占用 98%"更接近实际决策路径。</p>
+          </div>
+        </article>
+      </div>
+      <div class="col-12 col-md-6">
+        <article class="card h-100">
+          <div class="card-body small">
+            <h3 class="h6">与其余三个页面的衔接</h3>
+            <ul class="mb-0">
+              <li>数据同读 <code>data/facilities.json</code>，建筑高度用的峰值占用与场馆页表格是同一个派生函数 <code>CampusData.stats()</code></li>
+              <li>场馆页与首页每张卡片都有"三维定位"链接（<code>venue-3d.html?id=编号</code>），进来自动选中并聚焦</li>
+              <li>本页 HUD 里的"去查询与预约页"带编号回到 <code>facilities.html#f编号</code>，形成双向跳转</li>
+              <li>独立成一个页面：Three.js 体积最大，不塞进主页面拖慢首屏；离开本页即停渲染循环</li>
+            </ul>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer py-3">
+  <div class="container small">
+    <div>云南大学信息学院 · 软件开发综合实践 · 期末大作业｜统一题目：校园公共信息与数据展示中心｜选题：校园运动场馆</div>
+    <div class="text-secondary">数据为课堂练习用虚构数据，不对应真实场馆与价格｜三维场景全部由代码生成的几何体构成，未使用任何外部模型文件｜© <span id="footerYear">2026</span> 李偲钿 20251060150</div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+<script>if (!window.jQuery) document.write('<script src="vendor/jquery.min.js"><\/script>');</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>if (!window.bootstrap) document.write('<script src="vendor/bootstrap.bundle.min.js"><\/script>');</script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script>if (!window.THREE) document.write('<script src="vendor/three.min.js"><\/script>');</script>
+<script src="js/common.js"></script>
+<script src="js/data.js"></script>
+<script src="js/venue3d.js"></script>
+</body>
+</html>
