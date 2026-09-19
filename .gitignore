@@ -1,0 +1,11 @@
+# Word/Excel 临时锁文件（打开 docx 时自动生成，不属于交付物）
+~$*
+
+# 本地调试产物
+*.log
+extracted.txt
+.DS_Store
+Thumbs.db
+
+# 截图原图过大时可本地压缩后再提交，此处只忽略临时导出目录
+screenshots/raw/
