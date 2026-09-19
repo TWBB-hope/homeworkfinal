@@ -1,0 +1,81 @@
+{
+  "meta": {
+    "schemaVersion": "1.0",
+    "title": "校园运动场馆信息与数据展示中心",
+    "updatedAt": "2026-09-19",
+    "dataCutoff": "2026-09-19 14:00",
+    "source": "课堂练习用虚构数据，不对应真实场馆、真实开放时间与真实价格",
+    "units": {
+      "capacity": "人（同一时段可容纳人数）",
+      "bookedToday": "人次（由 slotBookings 逐时段求和得出，不单独存储）",
+      "peakLoad": "峰值时段占用率 = 该场馆最拥挤时段的已约人数 ÷ 容量",
+      "pricePerHour": "元 / 小时（0 表示自由进场、不收费）",
+      "history": "人次 / 天 / 校区"
+    },
+    "tables": {
+      "areas": "校区表：三维场景按此分组建模，x／z 为该校区在场景中的中心坐标（单位：米）",
+      "facilities": "场馆主表：id 为全馆唯一编号，areaId 关联 areas.id",
+      "slots": "开放时段表：全天固定 14 个整点时段，场馆某时段是否可约由 openFrom／openTo 与整点区间比较得出，不重复存储",
+      "slotBookings": "今日时段预约记录表（稀疏）：只列出已有人预约的时段，未列出的时段视为 0 人；此处人数不含浏览器本地保存的『我的预约』",
+      "history": "近 6 天各校区预约人次（今日那一条不在这里，由 slotBookings 现算，保证两处数字必然一致）",
+      "notices": "公告表：level 取 info／warning／success，对应 Bootstrap 提示条配色"
+    },
+    "rules": [
+      "bookable=false 的场馆为自由进场或暂停开放，不产生预约记录，因此不计入预约类图表，页面上会写明统计口径",
+      "status=maintenance 的场馆不出现在『今日开放』列表与三维高亮中",
+      "同一场馆同一时段的已约人数不得超过 capacity"
+    ]
+  },
+  "areas": [
+    { "id": "north", "name": "北区", "color": "#2f6f8f", "x": -46, "z": -46, "brief": "体育馆与田径场集中区" },
+    { "id": "center", "name": "中心区", "color": "#3f88b0", "x": 0, "z": -8, "brief": "游泳馆与综合体育馆" },
+    { "id": "east", "name": "东区", "color": "#c86b3c", "x": 46, "z": -42, "brief": "室外球场与健身步道" },
+    { "id": "south", "name": "南区", "color": "#6a8f6f", "x": 8, "z": 42, "brief": "风雨操场与健身中心" },
+    { "id": "west", "name": "西区", "color": "#8aa6b5", "x": -46, "z": 36, "brief": "小型球场，攀岩墙施工中" }
+  ],
+  "facilities": [
+    { "id": 1, "name": "北区体育馆羽毛球馆", "type": "球类", "areaId": "north", "capacity": 48, "openFrom": "08:00", "openTo": "21:30", "pricePerHour": 30, "bookable": true, "status": "open", "intro": "12 片羽毛球场，空调开放，需自带球拍" },
+    { "id": 2, "name": "北区体育馆乒乓球室", "type": "球类", "areaId": "north", "capacity": 24, "openFrom": "08:00", "openTo": "21:30", "pricePerHour": 15, "bookable": true, "status": "open", "intro": "8 张球台，球台与球拍可现场借用" },
+    { "id": 3, "name": "北区田径足球场", "type": "田径", "areaId": "north", "capacity": 200, "openFrom": "06:30", "openTo": "21:30", "pricePerHour": 0, "bookable": false, "status": "open", "intro": "400 米跑道与十一人制足球场，自由进场" },
+    { "id": 4, "name": "中心游泳馆 25 米池", "type": "水上", "areaId": "center", "capacity": 60, "openFrom": "12:00", "openTo": "20:30", "pricePerHour": 25, "bookable": true, "status": "open", "intro": "8 道标准短池，需戴泳帽，含淋浴" },
+    { "id": 5, "name": "中心游泳馆训练池", "type": "水上", "areaId": "center", "capacity": 30, "openFrom": "07:00", "openTo": "09:00", "pricePerHour": 20, "bookable": true, "status": "open", "intro": "浅水训练池，早间开放，游泳队训练时段除外" },
+    { "id": 6, "name": "中心区综合体育馆", "type": "综合", "areaId": "center", "capacity": 120, "openFrom": "08:00", "openTo": "21:30", "pricePerHour": 40, "bookable": true, "status": "open", "intro": "篮球、排球、羽毛球共用场地，可整队包场" },
+    { "id": 7, "name": "学生活动中心瑜伽室", "type": "健身", "areaId": "center", "capacity": 20, "openFrom": "18:00", "openTo": "21:00", "pricePerHour": 12, "bookable": true, "status": "open", "intro": "地暖与镜面墙，晚间课程制，垫子提供" },
+    { "id": 8, "name": "东区篮球场（室外）", "type": "球类", "areaId": "east", "capacity": 60, "openFrom": "06:30", "openTo": "21:30", "pricePerHour": 0, "bookable": false, "status": "open", "intro": "6 片室外场地，夜间有照明，自由进场" },
+    { "id": 9, "name": "东区网球场", "type": "球类", "areaId": "east", "capacity": 32, "openFrom": "08:00", "openTo": "20:30", "pricePerHour": 35, "bookable": true, "status": "open", "intro": "4 片硬地网球场，雨天临时关闭" },
+    { "id": 10, "name": "东区健身步道", "type": "田径", "areaId": "east", "capacity": 150, "openFrom": "06:30", "openTo": "21:30", "pricePerHour": 0, "bookable": false, "status": "open", "intro": "2 公里环校步道，自由进场，不设名额" },
+    { "id": 11, "name": "南区风雨操场综合馆", "type": "综合", "areaId": "south", "capacity": 120, "openFrom": "08:30", "openTo": "21:00", "pricePerHour": 40, "bookable": true, "status": "open", "intro": "雨天可用的大型综合馆，含 2 片篮球半场" },
+    { "id": 12, "name": "南区健身中心力量房", "type": "健身", "areaId": "south", "capacity": 35, "openFrom": "09:00", "openTo": "22:00", "pricePerHour": 10, "bookable": true, "status": "open", "intro": "器械区限流 35 人，需签到入场" },
+    { "id": 13, "name": "西区排球场", "type": "球类", "areaId": "west", "capacity": 40, "openFrom": "08:00", "openTo": "21:00", "pricePerHour": 0, "bookable": false, "status": "open", "intro": "3 片室外排球场，自由进场" },
+    { "id": 14, "name": "西区攀岩墙", "type": "综合", "areaId": "west", "capacity": 16, "openFrom": "暂停", "openTo": "暂停", "pricePerHour": 0, "bookable": false, "status": "maintenance", "intro": "岩点更换施工中，本学期暂停开放" }
+  ],
+  "slots": [
+    "08:00-09:00", "09:00-10:00", "10:00-11:00", "11:00-12:00", "12:00-13:00", "13:00-14:00", "14:00-15:00",
+    "15:00-16:00", "16:00-17:00", "17:00-18:00", "18:00-19:00", "19:00-20:00", "20:00-21:00", "21:00-22:00"
+  ],
+  "slotBookings": [
+    { "facilityId": 1, "counts": { "10:00-11:00": 18, "14:00-15:00": 30, "16:00-17:00": 36, "18:00-19:00": 44, "19:00-20:00": 47, "20:00-21:00": 41 } },
+    { "facilityId": 2, "counts": { "09:00-10:00": 6, "13:00-14:00": 9, "18:00-19:00": 17, "19:00-20:00": 21, "20:00-21:00": 14 } },
+    { "facilityId": 4, "counts": { "12:00-13:00": 22, "16:00-17:00": 41, "17:00-18:00": 48, "18:00-19:00": 55, "19:00-20:00": 58 } },
+    { "facilityId": 5, "counts": { "08:00-09:00": 8 } },
+    { "facilityId": 6, "counts": { "09:00-10:00": 34, "14:00-15:00": 52, "19:00-20:00": 96, "20:00-21:00": 88 } },
+    { "facilityId": 7, "counts": { "18:00-19:00": 15, "19:00-20:00": 19, "20:00-21:00": 11 } },
+    { "facilityId": 9, "counts": { "08:00-09:00": 9, "15:00-16:00": 20, "19:00-20:00": 27 } },
+    { "facilityId": 11, "counts": { "10:00-11:00": 28, "15:00-16:00": 45, "18:00-19:00": 66, "19:00-20:00": 74 } },
+    { "facilityId": 12, "counts": { "09:00-10:00": 11, "12:00-13:00": 19, "18:00-19:00": 30, "19:00-20:00": 33, "20:00-21:00": 29 } }
+  ],
+  "history": [
+    { "date": "09-13", "weekday": "周日", "byArea": { "north": 296, "center": 561, "east": 61, "south": 350, "west": 0 } },
+    { "date": "09-14", "weekday": "周一", "byArea": { "north": 244, "center": 498, "east": 48, "south": 296, "west": 0 } },
+    { "date": "09-15", "weekday": "周二", "byArea": { "north": 258, "center": 512, "east": 51, "south": 308, "west": 0 } },
+    { "date": "09-16", "weekday": "周三", "byArea": { "north": 270, "center": 534, "east": 53, "south": 322, "west": 0 } },
+    { "date": "09-17", "weekday": "周四", "byArea": { "north": 266, "center": 521, "east": 50, "south": 315, "west": 0 } },
+    { "date": "09-18", "weekday": "周五", "byArea": { "north": 289, "center": 552, "east": 58, "south": 341, "west": 0 } }
+  ],
+  "notices": [
+    { "date": "2026-09-19", "level": "warning", "title": "西区攀岩墙本学期暂停开放", "body": "岩点与保护绳整体更换，预计 11 月初恢复；期间周边区域禁止入内。" },
+    { "date": "2026-09-18", "level": "info", "title": "中心游泳馆每周二 10:00-12:00 换水消毒", "body": "该时段 25 米池与训练池均闭馆，预约系统会自动跳过此时段。" },
+    { "date": "2026-09-15", "level": "success", "title": "东区网球场开放线上预约", "body": "4 片硬地场现可按整点时段预约，每小时 35 元，雨天提前两小时可免费取消。" },
+    { "date": "2026-09-10", "level": "info", "title": "期中周场馆开放时间调整", "body": "11 月第 9～10 周，自习与锻炼高峰时段延长至 22:30，具体以本页面数据更新时间为准。" }
+  ]
+}
