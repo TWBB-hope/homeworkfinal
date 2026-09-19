@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>校园运动场馆信息与数据展示中心 · 信息首页</title>
+<meta name="description" content="软件开发综合实践期末大作业：校园公共信息与数据展示中心，围绕校园运动场馆提供信息查询、预约管理、数据可视化与三维导览的响应式前端应用">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      onerror="this.onerror=null;this.href='vendor/bootstrap.min.css'">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/pages.css">
+</head>
+<body>
+<a class="skip-link" href="#mainContent">跳到主要内容</a>
+<header>
+  <nav class="navbar navbar-expand-lg navbar-dark site-navbar sticky-top" aria-label="主导航">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">校园运动场馆中心</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#topNavCollapse"
+              aria-controls="topNavCollapse" aria-expanded="false" aria-label="展开或收起导航">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="topNavCollapse">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0" id="siteNav">
+          <li class="nav-item"><a class="nav-link active" aria-current="page" href="index.html">信息首页</a></li>
+          <li class="nav-item"><a class="nav-link" href="facilities.html">场馆查询与预约</a></li>
+          <li class="nav-item"><a class="nav-link" href="statistics.html">使用数据分析</a></li>
+          <li class="nav-item"><a class="nav-link" href="venue-3d.html">校园三维导览</a></li>
+        </ul>
+        <span class="navbar-text load-state" id="loadState">正在读取场馆数据…</span>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<main id="mainContent" class="container py-4">
+  <div id="messages" aria-live="polite"></div>
+
+  <section class="hero mb-4" aria-labelledby="heroTitle">
+    <h1 id="heroTitle">校园运动场馆信息与数据展示中心</h1>
+    <p class="mb-2">查开放、看名额、约场地、比拥挤度——一屏看清全校 14 个运动场馆的今日状态。</p>
+    <p class="hero-meta mb-0" id="heroMeta">数据来源读取中…</p>
+  </section>
+
+  <section class="mb-5" aria-labelledby="summaryTitle">
+    <h2 id="summaryTitle" class="h4 section-title mb-3">今日概览</h2>
+    <div class="row g-3" id="summaryCards">
+      <div class="col-12 col-sm-6 col-lg-3"><div class="card info-card h-100"><div class="card-body">
+        <h3 class="h6 text-secondary mb-1">加载中…</h3><p class="card-value mb-1">—</p>
+      </div></div></div>
+    </div>
+    <p class="small text-secondary mt-2 mb-0" id="summaryNote"></p>
+  </section>
+
+  <section class="mb-5" aria-labelledby="openNowTitle">
+    <h2 id="openNowTitle" class="h4 section-title mb-3">今日开放速览</h2>
+    <form class="row g-2 align-items-end mb-3" id="slotForm">
+      <div class="col-12 col-sm-6 col-lg-4">
+        <label class="form-label small" for="slotPick">选择一个整点时段</label>
+        <select class="form-select" id="slotPick"></select>
+      </div>
+      <div class="col-12 col-lg-8">
+        <p class="small text-secondary mb-0" id="slotHint">正在根据当前时间给出建议时段…</p>
+      </div>
+    </form>
+    <p class="small text-secondary mb-2" id="openNowState"></p>
+    <div class="row g-3" id="openNowList"></div>
+  </section>
+
+  <section class="mb-5" aria-labelledby="noticeTitle">
+    <h2 id="noticeTitle" class="h4 section-title mb-3">场馆公告</h2>
+    <div class="notice-list" id="noticeList"><p class="text-secondary small mb-0">加载中…</p></div>
+  </section>
+
+  <section class="mb-5" aria-labelledby="entryTitle">
+    <h2 id="entryTitle" class="h4 section-title mb-3">三个功能区</h2>
+    <div class="row g-3">
+      <div class="col-12 col-md-4">
+        <article class="card entry-card h-100">
+          <div class="card-body">
+            <h3 class="h6 card-title"><span class="entry-no">01</span>场馆查询与预约</h3>
+            <p class="small text-secondary">按类型、校区、拥挤度筛选，关键字搜索，支持排序；可添加、修改、取消我的预约，实时显示所选时段剩余名额。</p>
+            <a class="btn btn-sm btn-outline-primary" href="facilities.html">去查询与预约</a>
+          </div>
+        </article>
+      </div>
+      <div class="col-12 col-md-4">
+        <article class="card entry-card h-100">
+          <div class="card-body">
+            <h3 class="h6 card-title"><span class="entry-no">02</span>使用数据分析</h3>
+            <p class="small text-secondary">近 7 天各校区预约人次折线、场馆类型构成环形图、今日预约人次排行条形图，三图随筛选联动，并附数据一致性自检结论。</p>
+            <a class="btn btn-sm btn-outline-primary" href="statistics.html">看数据图表</a>
+          </div>
+        </article>
+      </div>
+      <div class="col-12 col-md-4">
+        <article class="card entry-card h-100">
+          <div class="card-body">
+            <h3 class="h6 card-title"><span class="entry-no">03</span>校园三维导览</h3>
+            <p class="small text-secondary">Three.js 生成的校园场馆模型：按校区分组，建筑高度表示峰值占用、颜色表示类型；可拖拽旋转、滚轮缩放、点选查看某场馆详情。</p>
+            <a class="btn btn-sm btn-outline-primary" href="venue-3d.html">进入三维场景</a>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="aboutTitle">
+    <h2 id="aboutTitle" class="h4 section-title mb-3">关于本作品</h2>
+    <div class="row g-3">
+      <div class="col-12 col-md-6">
+        <article class="card h-100">
+          <div class="card-body small">
+            <h3 class="h6">用到的技术（均为课堂讲授内容）</h3>
+            <ul class="mb-0">
+              <li>HTML 语义化标签 ＋ Bootstrap 5.3.3 栅格与组件（课堂一～三）</li>
+              <li>jQuery 3.7.1 选择器、事件委托与表单交互（课堂四、五）</li>
+              <li>本地 JSON 数据加载与三类异常提示（课堂五、六）</li>
+              <li>Chart.js 4.4.1 折线／环形／条形三类图表（课堂六）</li>
+              <li>Three.js 0.128.0 校园三维场景（课堂七）</li>
+              <li>Git 分步提交与浏览器开发者工具调试（课堂八）</li>
+            </ul>
+          </div>
+        </article>
+      </div>
+      <div class="col-12 col-md-6">
+        <article class="card h-100">
+          <div class="card-body small">
+            <h3 class="h6">数据与运行说明</h3>
+            <p class="mb-1" id="aboutSource">数据来源加载中…</p>
+            <p class="mb-1">全部页面为纯静态前端，无后端、无构建步骤。修改 <code>data/facilities.json</code> 后刷新页面，四个页面的数字会同步变化。</p>
+            <p class="mb-0">推荐用本地服务器打开：<code>python -m http.server 8000</code>。直接双击 html 也能运行，页面会提示已切换内置备份数据（浏览器禁止 <code>file://</code> 读取本地 JSON）。详见仓库 README。</p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer py-3">
+  <div class="container small">
+    <div>云南大学信息学院 · 软件开发综合实践 · 期末大作业｜统一题目：校园公共信息与数据展示中心｜选题：校园运动场馆</div>
+    <div class="text-secondary">数据为课堂练习用虚构数据，不对应真实场馆与价格｜纯前端静态站点，无后端｜© <span id="footerYear">2026</span> 李偲钿 20251060150</div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+<script>if (!window.jQuery) document.write('<script src="vendor/jquery.min.js"><\/script>');</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>if (!window.bootstrap) document.write('<script src="vendor/bootstrap.bundle.min.js"><\/script>');</script>
+<script src="js/common.js"></script>
+<script src="js/data.js"></script>
+<script src="js/home.js"></script>
+</body>
+</html>

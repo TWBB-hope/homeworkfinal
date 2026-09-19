@@ -7,6 +7,16 @@ window.Campus = window.Campus || {};
 
 (function (C) {
 
+  /* jQuery 别名与入口：页面脚本一律用 C.$() 取元素、C.ready() 等 DOM 就绪，
+     这样万一 jQuery 走的是 vendor 兜底也不影响后续代码。 */
+  C.$ = function (selector) {
+    return window.jQuery(selector);
+  };
+
+  C.ready = function (fn) {
+    window.jQuery(document).ready(fn);
+  };
+
   /* 把任意文本转成可以安全写进 HTML 字符串的形式。
      场馆名来自 JSON、关键字来自用户输入、预约记录来自 localStorage，三者都可能含 < > " '，
      不转义直接拼串会把内容当标签解析（也会造成 XSS）。所有 .html() 拼接前都要过这个函数。 */
