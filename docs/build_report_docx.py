@@ -196,9 +196,12 @@ def main():
     trim_outline(doc)
 
     doc.add_page_break()
-    add_heading(doc, '期末大作业报告正文', 1)
-    add_body(doc, '以下按作业要求的七个部分逐条作答。截图位置以【截图待补：文件名】标出，'
-                  '命名与拍摄要求见仓库 screenshots/README.md。')
+    add_heading(doc, '软件开发综合实践 · 期末大作业报告', 1)
+    add_body(doc, '学号：20251060150　姓名：李偲钿　班级：4 班　年级／专业：＿＿＿＿＿＿＿＿　任课教师：＿＿＿＿＿＿　日期：2026 年 9 月 19 日')
+    add_body(doc, '统一题目：校园公共信息与数据展示中心　｜　选题：校园运动场馆信息与数据展示中心　｜　'
+                  '远程仓库：https://github.com/TWBB-hope/homeworkfinal')
+    add_body(doc, '以下按作业要求的七个部分逐条作答，末尾的"附一／附二"沿用课堂进度报告的写法补上收获总结、'
+                  '问题解决过程与工具出处。截图位置以【截图待补：文件名】标出，命名与拍摄要求见仓库 screenshots/README.md。')
 
     lines = io.open(SOURCE, encoding='utf-8').read().split('\n')
     start = next(i for i, l in enumerate(lines) if l.startswith('## 一、'))
