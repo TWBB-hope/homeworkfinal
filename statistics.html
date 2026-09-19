@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>使用数据分析 · 校园运动场馆信息与数据展示中心</title>
+<meta name="description" content="校园运动场馆近 7 天各校区预约人次折线图、场馆类型构成环形图、今日预约人次排行条形图，附数据一致性自检">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      onerror="this.onerror=null;this.href='vendor/bootstrap.min.css'">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/pages.css">
+</head>
+<body>
+<a class="skip-link" href="#mainContent">跳到主要内容</a>
+<header>
+  <nav class="navbar navbar-expand-lg navbar-dark site-navbar sticky-top" aria-label="主导航">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">校园运动场馆中心</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#topNavCollapse"
+              aria-controls="topNavCollapse" aria-expanded="false" aria-label="展开或收起导航">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="topNavCollapse">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0" id="siteNav">
+          <li class="nav-item"><a class="nav-link" href="index.html">信息首页</a></li>
+          <li class="nav-item"><a class="nav-link" href="facilities.html">场馆查询与预约</a></li>
+          <li class="nav-item"><a class="nav-link active" aria-current="page" href="statistics.html">使用数据分析</a></li>
+          <li class="nav-item"><a class="nav-link" href="venue-3d.html">校园三维导览</a></li>
+        </ul>
+        <span class="navbar-text load-state" id="loadState">正在读取场馆数据…</span>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<main id="mainContent" class="container py-4">
+  <div id="messages" aria-live="polite"></div>
+
+  <h1 class="h3 mb-1">使用数据分析</h1>
+  <p class="text-secondary small mb-4">三类图表全部由同一份 <code>data/facilities.json</code> 现算：折线看趋势、环形看结构、条形看排行。改筛选条件只更新数据，不重新初始化图表。</p>
+
+  <section class="mb-4" aria-labelledby="filterTitle">
+    <h2 id="filterTitle" class="h5 section-title mb-3">统计口径（三图联动）</h2>
+    <form class="row g-2 align-items-end card filter-card p-3" id="statFilterForm">
+      <div class="col-12 col-sm-6 col-lg-3">
+        <label class="form-label small" for="areaFilter">校区</label>
+        <select class="form-select form-select-sm" id="areaFilter"><option value="all">全部校区</option></select>
+      </div>
+      <div class="col-12 col-sm-6 col-lg-3">
+        <label class="form-label small" for="typeFilter">运动类型</label>
+        <select class="form-select form-select-sm" id="typeFilter"><option value="all">全部类型</option></select>
+      </div>
+      <div class="col-12 col-sm-6 col-lg-3">
+        <label class="form-label small" for="topCount">条形图显示前几名</label>
+        <select class="form-select form-select-sm" id="topCount">
+          <option value="5">前 5 名</option>
+          <option value="8" selected>前 8 名</option>
+          <option value="12">前 12 名</option>
+        </select>
+      </div>
+      <div class="col-12 col-sm-6 col-lg-3 d-flex align-items-end">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="bookableOnly" checked>
+          <label class="form-check-label small" for="bookableOnly">只统计支持线上预约的场馆</label>
+        </div>
+      </div>
+      <div class="col-12">
+        <p class="small text-secondary mb-0 mt-2" id="statEcho">口径回显加载中…</p>
+      </div>
+    </form>
+  </section>
+
+  <section class="mb-4" aria-labelledby="lineTitle">
+    <div class="card">
+      <div class="card-body">
+        <h2 id="lineTitle" class="h6 card-title">近 7 天各校区预约人次（人次／天）</h2>
+        <p class="small text-secondary mb-2">横轴为统计日，最后一点为"今日"，由今日时段预约记录现算；点击图例可单独隐藏某条校区曲线。</p>
+        <div class="chart-box" id="weekBox">
+          <canvas id="weekChart" role="img" aria-label="折线图：近 7 天各校区每日预约人次，单位人次每天"></canvas>
+        </div>
+        <p class="small text-secondary mt-2 mb-0" id="weekStat"></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="mb-4" aria-labelledby="doughnutTitle">
+    <div class="row g-3">
+      <div class="col-12 col-lg-6">
+        <div class="card h-100">
+          <div class="card-body">
+            <h2 id="doughnutTitle" class="h6 card-title">场馆类型构成（个／占比）</h2>
+            <p class="small text-secondary mb-2">按场馆主表的 type 字段分组，中心数字为参与统计的场馆总数。</p>
+            <div class="chart-box" id="typeBox">
+              <canvas id="typeChart" role="img" aria-label="环形图：各运动类型场馆数量占比，单位个"></canvas>
+            </div>
+            <p class="small text-secondary mt-2 mb-0" id="typeStat"></p>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 col-lg-6">
+        <div class="card h-100">
+          <div class="card-body">
+            <h2 class="h6 card-title">今日预约人次排行（人次／场馆）</h2>
+            <p class="small text-secondary mb-2">各场馆当日 14 个整点时段已约人数之和，含本机新增的预约。</p>
+            <div class="chart-box chart-box-tall" id="rankBox">
+              <canvas id="rankChart" role="img" aria-label="水平条形图：今日各场馆预约人次排行，单位人次"></canvas>
+            </div>
+            <p class="small text-secondary mt-2 mb-0" id="rankStat"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="mb-4" aria-labelledby="checkTitle">
+    <div class="card">
+      <div class="card-body">
+        <h2 id="checkTitle" class="h6 card-title">数据一致性自检</h2>
+        <p class="small text-secondary mb-2">同一个人次用两条互相独立的算法各算一遍，再和图表上的数字比对；任何一条不通过都会在这里标红，并在页面顶部给出提示。</p>
+        <ul class="list-unstyled check-list mb-2" id="checkList"></ul>
+        <p class="small text-secondary mb-0" id="checkSummary"></p>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="sourceTitle">
+    <h2 id="sourceTitle" class="h5 section-title mb-3">数据来源与正确性</h2>
+    <div class="row g-3">
+      <div class="col-12 col-md-6">
+        <article class="card h-100">
+          <div class="card-body small">
+            <h3 class="h6">数据从哪来</h3>
+            <p class="mb-1" id="source">加载中…</p>
+            <p class="mb-0" id="sourceRules"></p>
+          </div>
+        </article>
+      </div>
+      <div class="col-12 col-md-6">
+        <article class="card h-100">
+          <div class="card-body small">
+            <h3 class="h6">三张表怎么支撑三张图</h3>
+            <ul class="mb-0">
+              <li>折线图 ← <code>history</code>（近 6 天各校区人次）＋ <code>slotBookings</code> 现算的今日点</li>
+              <li>环形图 ← <code>facilities</code> 的 <code>type</code> 字段分组计数</li>
+              <li>条形图 ← <code>slotBookings</code> 按场馆逐时段累加，再叠加本机预约</li>
+              <li>三图的"今日"完全同源：改一条本机预约，三处数字同步变化</li>
+            </ul>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer py-3">
+  <div class="container small">
+    <div>云南大学信息学院 · 软件开发综合实践 · 期末大作业｜统一题目：校园公共信息与数据展示中心｜选题：校园运动场馆</div>
+    <div class="text-secondary">数据为课堂练习用虚构数据，不对应真实场馆与价格｜纯前端静态站点，无后端｜© <span id="footerYear">2026</span> 李偲钿 20251060150</div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+<script>if (!window.jQuery) document.write('<script src="vendor/jquery.min.js"><\/script>');</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>if (!window.bootstrap) document.write('<script src="vendor/bootstrap.bundle.min.js"><\/script>');</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>if (!window.Chart) document.write('<script src="vendor/chart.umd.min.js"><\/script>');</script>
+<script src="js/common.js"></script>
+<script src="js/data.js"></script>
+<script src="js/statistics.js"></script>
+</body>
+</html>
