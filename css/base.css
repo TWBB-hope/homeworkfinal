@@ -1,0 +1,180 @@
+/* base.css —— 全站公共样式
+   引入顺序：Bootstrap 在前、本文件在后，保证自定义能覆盖框架默认值。
+   这里只写 Bootstrap 没有的东西：主题色、导航与页脚、提示条、通用卡片、三档断点。 */
+
+:root {
+  --campus-primary: #1f5f5b;
+  --campus-primary-dark: #164a46;
+  --campus-accent: #d0762d;
+  --campus-bg: #f5f7f6;
+  --campus-line: #dde4e1;
+  --campus-muted: #5c6b66;
+}
+
+body {
+  background-color: var(--campus-bg);
+  color: #21262a;
+  /* 手机端防止长单词（场馆名）撑破容器 */
+  overflow-wrap: break-word;
+}
+
+main {
+  min-height: 62vh;
+}
+
+/* ---------- 顶部导航 ---------- */
+.site-navbar {
+  background-color: var(--campus-primary);
+}
+
+.site-navbar .navbar-brand {
+  font-weight: 700;
+  letter-spacing: .02em;
+}
+
+.site-navbar .nav-link {
+  border-radius: .375rem;
+  padding-left: .7rem;
+  padding-right: .7rem;
+}
+
+.site-navbar .nav-link.active {
+  background-color: rgba(255, 255, 255, .18);
+  font-weight: 600;
+}
+
+/* 当前页之外的导航项也给出色差，避免只靠下划线区分 */
+.site-navbar .nav-link {
+  color: rgba(255, 255, 255, .78);
+}
+
+.site-navbar .nav-link:hover,
+.site-navbar .nav-link:focus {
+  color: #fff;
+}
+
+/* 跳过导航：只用键盘的访问者可以一步到正文 */
+.skip-link {
+  position: absolute;
+  left: -999px;
+  top: 0;
+  z-index: 1080;
+}
+
+.skip-link:focus {
+  left: .5rem;
+  top: .5rem;
+  padding: .35rem .7rem;
+  background: #fff;
+  border-radius: .375rem;
+}
+
+/* ---------- 提示条 ---------- */
+#messages .alert {
+  margin-bottom: .5rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, .06);
+}
+
+/* 页面右上角的数据状态（就绪／降级） */
+.load-state {
+  font-size: .8rem;
+  color: rgba(255, 255, 255, .85);
+}
+
+/* ---------- 通用卡片与标题 ---------- */
+.section-title {
+  position: relative;
+  padding-left: .65rem;
+  border-left: 4px solid var(--campus-accent);
+  line-height: 1.25;
+}
+
+.info-card {
+  border: 1px solid var(--campus-line);
+  border-top: 3px solid var(--campus-primary);
+}
+
+.info-card .card-value {
+  font-size: 1.65rem;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--campus-primary-dark);
+}
+
+.entry-card {
+  border: 1px solid var(--campus-line);
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+
+.entry-card:hover,
+.entry-card:focus-within {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(31, 95, 91, .14);
+}
+
+.entry-card .entry-no {
+  display: inline-block;
+  min-width: 1.75rem;
+  color: var(--campus-accent);
+  font-weight: 700;
+}
+
+/* ---------- 表格与徽章 ---------- */
+.data-table th,
+.data-table td {
+  vertical-align: middle;
+}
+
+.data-table th[scope="row"] {
+  font-weight: 500;
+}
+
+.occupancy-bar {
+  height: .45rem;
+  min-width: 3.5rem;
+  border-radius: 1rem;
+  background-color: #e3e8e6;
+  overflow: hidden;
+}
+
+.occupancy-bar > span {
+  display: block;
+  height: 100%;
+  background-color: var(--campus-primary);
+}
+
+/* 颜色只作辅助，同处一定给出数字，保证不单靠颜色传达信息 */
+.badge-soft {
+  font-weight: 600;
+}
+
+/* ---------- 页脚 ---------- */
+.site-footer {
+  margin-top: 2.5rem;
+  background-color: #e6eae8;
+  color: #414a45;
+  border-top: 1px solid var(--campus-line);
+}
+
+/* ---------- 三档断点微调（375 / 768 / 1200+） ---------- */
+@media (max-width: 575.98px) {
+  /* 手机上标题与数字收紧一号，避免卡片被撑到换行错位 */
+  .info-card .card-value {
+    font-size: 1.4rem;
+  }
+
+  main.container {
+    padding-left: .75rem;
+    padding-right: .75rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  /* 尊重系统的"减少动效"设置 */
+  .entry-card,
+  .entry-card:hover {
+    transition: none;
+    transform: none;
+  }
+}
