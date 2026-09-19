@@ -323,10 +323,11 @@
 
   function chartLibMissing() {
     if (window.Chart && typeof window.Chart.register === 'function') return false;
-    C.$('.chart-box').html('<div class="chart-fallback">图表库 Chart.js 未能加载（离线或 CDN 被拦截）。'
+    C.$('.chart-box').html('<div class="chart-fallback">图表库 Chart.js 未能加载（CDN 与仓库内 vendor/ 副本都没取到）。'
       + '本页的统计文字与自检结论仍可读，场馆查询与预约功能不受影响。</div>');
-    C.notify('danger', '图表库 Chart.js 未能加载：已自动改用仓库内 vendor/chart.umd.min.js 的同版本副本；'
-      + '若该文件也不存在，请执行 git restore vendor/ 或重新克隆仓库。', { sticky: true });
+    C.notify('danger', '图表库 Chart.js 未能加载：CDN 不可达时本应自动改读仓库内 vendor/chart.umd.min.js，'
+      + '现在两条路都没取到，说明 vendor 里的副本也缺了。请在仓库根目录执行 git restore vendor/ 或重新克隆；'
+      + '下面的统计结论与一致性自检不依赖图表库，照常给出。', { sticky: true });
     return true;
   }
 

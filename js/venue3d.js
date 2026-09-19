@@ -450,9 +450,9 @@
   function libMissing() {
     if (window.THREE && window.THREE.Scene) return false;
     document.getElementById('fallback').innerHTML =
-      '<div class="alert alert-danger m-0" role="alert">三维库 Three.js 未能加载（离线或 CDN 被拦截）。'
-      + '已自动改用仓库内 <code>vendor/three.min.js</code> 的同版本副本；若该文件也不存在，'
-      + '请在仓库根目录执行 <code>git restore vendor/</code> 或重新克隆。'
+      '<div class="alert alert-danger m-0" role="alert">三维库 Three.js 未能加载（CDN 与仓库内 '
+      + '<code>vendor/three.min.js</code> 都没取到）。请在仓库根目录执行 '
+      + '<code>git restore vendor/</code> 或重新克隆仓库。'
       '场馆列表、筛选与预约功能不依赖三维库，可正常使用。</div>';
     C.$('#stage').css('min-height', '96px');
     return true;
