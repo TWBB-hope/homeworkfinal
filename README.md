@@ -178,6 +178,6 @@ git remote -v              # origin = git@github.com:TWBB-hope/homeworkfinal.git
 | 期末大作业报告（七部分，Word） | `docs/期末大作业报告.docx` |
 | 报告的可读版（Markdown） | `docs/期末大作业报告.md` |
 | 开发进度与风险记录 | `docs/dev-log.md` |
-| 测试记录（14 条用例） | `docs/测试记录.md`，同时收录在报告第六部分 |
+| 测试记录（34 条用例） | `docs/测试记录.md`，同时收录在报告第六部分 |
 | 截图清单与命名约定 | `screenshots/README.md` |
 | 作业要求原件 | `final-assignment.docx` |

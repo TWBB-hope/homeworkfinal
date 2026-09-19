@@ -59,7 +59,10 @@
 
 - [ ] 按 `screenshots/README.md` 补齐全部截图，报告里的 `【截图待补：…】` 换成实际图片。
 - [ ] 手机真机（或 DevTools 设备模拟）跑一遍四个页面，确认 375px 无横向滚动、卡片视图可用。
-- [ ] 用 <https://validator.w3.org> 校验四个页面，处理所有 error。
+- [x] 用 validator.w3.org 的 Nu 校验器（`--data-binary "@页面" https://validator.w3.org/nu/?out=json`）校验四个页面：
+      首轮 `facilities.html` 报 2 个 error——Bootstrap 官方写法在 `type="radio"` 上写的 `autocomplete="off"` 不被规范允许，
+      删掉该属性后四个页面均为 **0 error、0 warning**（复现命令见报告第六部分）。
 - [ ] 在另一台电脑上按 README 方式 A 完整走一遍，确认能跑起来（报告第六部分第 4 条）。
+- [x] 回归测试：四个页面加载与关键流程（预约增删改、三图与自检、三维深度链接）在最后一轮改动后重跑，Console 无报错。
 - [ ] 每个 js 文件随机挑 3 段代码，口述 1 分钟并现场改一个小需求（对应 R5）。
 - [ ] 报告封面填写年级、专业、日期，并与 `docs/期末大作业报告.docx` 一起提交。
