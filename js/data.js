@@ -96,11 +96,12 @@
         done();
         return;
       }
-      var reason = error === 'bad-structure'
-        ? 'JSON 能读出来，但缺少 facilities 数组（格式与 meta.tables 说明不一致）'
-        : '请求未成功（' + (error || '未知原因') + '）';
-      C.notify('warning', '场馆数据读取失败：' + reason + '。已切换到 js/data.js 内置备份数据，功能可正常演示。'
-        + '若你是直接双击 html 打开的，请改用本地服务器：python -m http.server 8000', { sticky: true });
+      var detail = error === 'bad-structure'
+        ? { reason: 'JSON 能读出来，但缺少 facilities 数组（与 meta.tables 里声明的结构不一致）',
+            hint: '请对照 data/facilities.json 的 meta.tables 说明补回 facilities 字段。' }
+        : error;
+      C.notify('warning', '场馆数据读取失败：' + detail.reason + '。已切换到 js/data.js 内置备份数据（内容与 JSON 一致），'
+        + '页面功能可正常演示。' + (detail.hint || ''), { sticky: true });
       use(BACKUP_DATA, 'js/data.js 内置备份数据（内容与 data/facilities.json 一致）');
       done();
     });
@@ -113,27 +114,55 @@
     C.dataFrom = from;
     var el = document.getElementById('loadState');
     if (el) {
-      el.textContent = (from.indexOf('备份') === -1 ? '数据就绪 · ' : '降级：备份数据 · ')
-        + facilityList().length + ' 个场馆 · 统计截至 ' + (data.meta.dataCutoff || data.meta.updatedAt);
+      var count = facilityList().length;
+      var prefix = count === 0 ? '数据为空 · ' : (from.indexOf('备份') === -1 ? '数据就绪 · ' : '降级：备份数据 · ');
+      el.textContent = prefix + count + ' 个场馆 · 统计截至 ' + (data.meta.dataCutoff || data.meta.updatedAt);
     }
   }
 
   /* 统一包装 $.getJSON 与"解析成功但内容为空"两种情况，四个页面共用一套判定 */
   C.loadJson = function (url, done) {
-    var request = window.jQuery ? jQuery.getJSON(url) : null;
+    var request = window.jQuery ? C.getJson(url) : null;
     if (!request) {
-      done(null, 'jQuery 未加载');
+      done(null, { reason: 'jQuery 未能加载，无法发起数据请求', hint: '请确认 vendor/jquery.min.js 存在。' });
       return;
     }
     request.done(function (data) {
-      if (!data) { done(null, '返回内容为空'); return; }
+      if (!data) { done(null, { reason: '服务器返回内容为空', hint: '' }); return; }
       if (!Array.isArray(data.facilities)) { done(data, 'bad-structure'); return; }
       if (data.facilities.length === 0) { done(data, 'empty-data'); return; }
       done(data, 'ok');
     }).fail(function (jqXHR, textStatus) {
-      done(null, textStatus === 'error' ? 'JSON 解析失败或文件不存在' : textStatus);
+      done(null, explainFailure(jqXHR, textStatus));
     });
   };
+
+  /* 把 jQuery 的状态码翻译成能区分"文件没了"和"文件在但格式错"的说法：
+     这两种情况要做的动作完全不同，混成一条提示就没法照着排查。
+     reason 说清是什么问题，hint 给下一步动作（只有确实与打开方式有关时才提本地服务器）。 */
+  function explainFailure(jqXHR, textStatus) {
+    var status = jqXHR && jqXHR.status;
+    if (textStatus === 'parsererror') {
+      return {
+        reason: '文件能读到（HTTP ' + status + '）但 JSON 解析失败，多半是少了逗号或引号',
+        hint: '定位办法：在仓库根目录执行 python -m json.tool data/facilities.json，它会直接报出出错的行与列。'
+      };
+    }
+    if (textStatus === 'error' && status === 404) {
+      return {
+        reason: 'HTTP 404，找不到 data/facilities.json',
+        hint: '请确认文件名与路径（大小写敏感），或执行 git restore data/facilities.json 恢复原始数据。'
+      };
+    }
+    if (textStatus === 'error') {
+      return {
+        reason: 'HTTP ' + (status || '无响应') + '，请求未成功',
+        hint: '若你是直接双击 html 打开的（地址栏以 file:// 开头），浏览器禁止本地页面读取同源文件，'
+          + '请改用本地服务器：python -m http.server 8000'
+      };
+    }
+    return { reason: textStatus === 'timeout' ? '请求超时' : (textStatus || '未知原因'), hint: '' };
+  }
 
   /* ---------- 二、我的预约（localStorage 叠加层） ---------- */
   function myBookings() {
@@ -317,7 +346,7 @@
       { label: '逐场馆求和 今日预约人次 = ' + C.num(perFacility) + ' 人次', ok: perFacility === today.total, detail: '另一条路径：折线图今日点各校区合计 = ' + C.num(today.total) + ' 人次' },
       { label: '逐时段累加 = ' + C.num(perSlotTotal) + ' 人次', ok: perSlotTotal === perFacility, detail: '与逐场馆求和相互独立，两条路径都从 slotBookings＋我的预约 出发' },
       { label: '环形图各扇区合计 = ' + typeSum + ' 个', ok: typeSum === facilityList().length, detail: '场馆主表共 ' + facilityList().length + ' 条，环形图按类型分组不应多也不应少' },
-      { label: '时段已约人数 ≤ 容量', ok: overCapacity.length === 0, detail: overCapacity.length ? '超出：' + overCapacity.join('、') : '14 个整点时段逐一核对，无一超容' },
+      { label: '时段已约人数 ≤ 容量', ok: overCapacity.length === 0, detail: overCapacity.length ? '超出：' + overCapacity.join('、') : '逐场馆逐时段核对，没有任何一个时段的已约人数超过容量' },
       { label: '图表口径已注明', ok: true, detail: '折线与条形只统计 ' + bookable.length + ' 个支持线上预约的场馆，自由进场场馆不计入' }
     ];
   }

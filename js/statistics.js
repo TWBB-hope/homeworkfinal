@@ -247,11 +247,15 @@
 
   function renderCharts(f) {
     var week = weekData(f);
-    var empty = !filteredFacilities(f).length || !week.labels.length;
+    var noData = !D.facilityList().length;
+    var empty = noData || !filteredFacilities(f).length || !week.labels.length;
     if (empty) {
       destroyCharts();
-      C.$('.chart-box').html('<div class="chart-fallback">当前筛选口径下没有可统计的场馆，图表暂不渲染。请放宽校区或类型条件。</div>');
-      C.notify('info', '筛选后场馆数为 0，三张图都已停用；清空条件即可恢复。');
+      var reason = noData
+        ? '场馆主表为空（facilities 数组长度为 0），没有可统计的数据。请恢复 data/facilities.json 后刷新。'
+        : '当前筛选口径下没有可统计的场馆，图表暂不渲染。请放宽校区或类型条件。';
+      C.$('.chart-box').html('<div class="chart-fallback">' + C.escape(reason) + '</div>');
+      C.notify('info', reason);
       C.$('#weekStat,#typeStat,#rankStat').text('');
       return;
     }

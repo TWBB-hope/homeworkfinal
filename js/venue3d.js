@@ -458,9 +458,33 @@
     return true;
   }
 
+  /* 三维库不可用时的降级：场景画不出来，但文字信息、图例与场馆定位链接照常给出，
+     页面不白屏，用户仍能拿到"哪个校区有几个馆、哪个最挤"的结论。 */
+  function renderTextFallback() {
+    C.$('#stage').removeClass().css({ height: 'auto', minHeight: '0' });
+    C.$('#areaJump').empty();
+    C.$('#hud').addClass('d-none');
+    buildLegend();
+    C.$('#encoding').text('三维场景暂不可用，下面这条说明仍然成立：建筑高度本应表示容量、颜色表示运动类型、屋顶灯色表示峰值占用分档（阈值与场馆页徽章一致：50%／80%）。');
+    var $list = C.$('#venueQuickList').empty();
+    D.facilityList().forEach(function (f) {
+      var s = D.stats(f);
+      $list.append(
+        $('<div class="col-12 col-md-6 col-lg-3"></div>').append(
+          $('<a class="btn btn-sm btn-outline-secondary w-100 text-truncate" href="facilities.html#f' + f.id + '"></a>')
+            .text(f.name + '（' + (f.bookable && f.status === 'open' ? '峰值 ' + C.pct(s.peakLoad) + ' ' + s.level.text : '不计拥挤度') + '）')
+        )
+      );
+    });
+    C.notify('warning', '已改用文字清单浏览，可直接点下面的场馆名跳到查询与预约页。', { duration: 12000 });
+  }
+
   function boot() {
     stage = document.getElementById('stage');
-    if (libMissing()) return;
+    if (libMissing()) {
+      renderTextFallback();
+      return;
+    }
 
     setupScene();
     build();

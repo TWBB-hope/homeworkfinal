@@ -144,4 +144,11 @@ window.Campus = window.Campus || {};
     return !!window[name];
   };
 
+  /* 读本地 JSON 必须绕开浏览器缓存：README 承诺"改完 JSON 刷新即见"，
+     若命中缓存则改了文件页面还是旧数字，会被误判成代码没生效。
+     带一个时间戳查询参数即可让每次请求都回到服务器。 */
+  C.getJson = function (url) {
+    return window.jQuery.getJSON(url, { _: Date.now() });
+  };
+
 })(window.Campus);
